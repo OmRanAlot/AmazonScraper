@@ -30,21 +30,7 @@ driver = setup_drivers()
 driver.get(url)
 
 arr =[]
-'''
-a-section a-spacing-small a-spacing-top-small
-'''
-
-
 comps = driver.find_elements(By.XPATH, "//div[@data-index]")
-print(comps)
-
-name = comps[2].find_element(By.CSS_SELECTOR, 'a.a-link-normal').get_attribute("href")
-print(name)
-
-
-name2 = comps[3].find_element(By.CSS_SELECTOR, 'a.a-link-normal').get_attribute("href")
-print(name2)
-
 
 for i in comps:
     try:
@@ -67,8 +53,8 @@ for i in comps:
     if name is not None and price is not None and url is not None:
         arr.append({"name":name,"price":price,"url":url})
     
-
-print(arr)
+df = pd.DataFrame(arr)
+df.to_csv("output.csv")
 
 
 time.sleep(10)

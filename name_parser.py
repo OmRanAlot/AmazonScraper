@@ -88,7 +88,9 @@ def find_storage(word):
         return "Unable to find Storage"
 
 
-for i in test:
-    # print(find_manufacturer(i))
-    # print(find_cpu(i))
-    print(find_storage(i))
+def get_data(word):
+    return {"manufacturer": find_manufacturer(word), 
+            "CPU":find_cpu(word),
+            "RAM": find_ram(word), 
+            "Storage":find_storage(word)
+            }

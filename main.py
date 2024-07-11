@@ -10,7 +10,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import pandas as pd
 import time
 import statistics
-
+import name_parser
 
 def setup_drivers():
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"
@@ -43,10 +43,11 @@ def get_end_time(start_time):
     time_arr.append(time_taken)
 
 def amazon_scraper(url):
+    #make a variable for the results array seperately
+    #or you can make it here and then return it but when I do that my computer freezes :P
+    
     start_time_local = time.time()
     driver.get(url)
-    
-
     running = True
     while running:
         # comps = WebDriverWait(driver,5).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@data-index]")))
@@ -70,8 +71,8 @@ def amazon_scraper(url):
                 url = None
             
             if name is not None and price is not None and url is not None:
-                
-                result_arr.append({"name":name,"price":price,"url":url})
+                specs = name_parser.get_data(name.lower())
+                result_arr.append({"name":name,"Specs":specs,"price":price,"url":url})
         
         try:
             # next_button = WebDriverWait(driver,5).until(EC.element_to_be_clickable((By.CLASS_NAME, 's-pagination-next')))
@@ -81,7 +82,10 @@ def amazon_scraper(url):
             driver.get(next_url)
             
         except:
-            print("leaving the loop")
+            print("closing drivers")
+            driver.close()
+            driver.quit()
+            print("leaving loop")
             break
         
             
@@ -96,7 +100,6 @@ url = "https://www.amazon.com/s?k=laptop"
 amazon_scraper(url)
 
 df = pd.DataFrame(result_arr)
-driver.quit()
 df.to_csv("output.csv")
 
 end_time = time.time()

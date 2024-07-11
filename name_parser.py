@@ -19,9 +19,7 @@ storage_keyword = ["ssd","storage","emmc" ]
 GPU_keyword = ["graphics", "GPU"]
 manufacturer = ['lenovo', "apple", "dell", "hp","acer","razor"]
 
-test = ["Lenovo V15 Laptop, 15.6"" FHD Display, AMD Ryzen 5 5500U Hexa-core Processor (Beat Intel i7-1065G7), 16GB RAM, 1TB SSD, HDMI, RJ45, Numeric Keypad, Wi-Fi, Windows 10 Home, 1.7Kg, Black".lower(),
-        "HP Newest 15.6’’ FHD Laptop, 16GB DDR5 RAM, 1TB PCIe SSD, AMD Ryzen 5 7520U, AMD Radeon Graphics, Windows 11 Home, Webcam, Wi-Fi, Bluetooth, Long Battery Life, Alpacatec Accessories, Silver".lower(),
-        "Apple 2024 MacBook Air 13-inch Laptop with M3 chip: 13.6-inch Liquid Retina Display, 8GB Unified Memory, 256GB SSD Storage, Backlit Keyboard, 1080p FaceTime HD Camera, Touch Bar, Silver".lower()]
+test = ["Lenovo V15 G4 Business Laptop, 15.6\" FHD Screen, 13th Gen Intel 10 Cores i7-1355U up to 5.0GHz, 24GB RAM, 1TB PCIe SSD, HD Camera with Privacy Shutter, Wi-Fi, HDMI, Windows 11 Pro, Black".lower()]
 
 def find_cpu(word):
     length = int (len(word))
@@ -50,7 +48,7 @@ def find_manufacturer(word):
     return "Unable to find manufacturer"
 
 def find_ram(word):
-    RAM_index = word.find("ram")
+    RAM_index = max(word.find("ram"), word.find("unified"))
     for i in range(RAM_index, 0, -1):
         if word[i] in break_char:
             left_break = i
@@ -94,3 +92,6 @@ def get_data(word):
             "RAM": find_ram(word), 
             "Storage":find_storage(word)
             }
+
+# for i in test:
+#     print(get_data(i))

@@ -1,5 +1,7 @@
 from selenium import webdriver
 
+MAX_PAGES = 15
+
 
 
 def setup_drivers_chrome():

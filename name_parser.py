@@ -1,23 +1,10 @@
-'''
-ML/AI model that retrives the info from the display name
-
-see the CPU weght and GPU(if there) weight
-Company name - DONE
-CPU - DONE
-RAM - -DONE
-Storage - DONE
-Screen size
-'''
-
-
 import pandas as pd
-df = pd.read_csv("output.csv")
 
-break_char = [":","|", ",",]
+break_char = [":","|", ","]
 CPU = ["m3", "m2", "m1", "intel", "amd"]
 storage_keyword = ["ssd","storage","emmc" ]
 GPU_keyword = ["graphics", "GPU"]
-manufacturer = ['lenovo', "apple", "dell", "hp","acer","razor"]
+manufacturer = ['lenovo', "apple", "dell", "hp","acer","razor", "asus"]
 
 test = ["Lenovo V15 G4 Business Laptop, 15.6\" FHD Screen, 13th Gen Intel 10 Cores i7-1355U up to 5.0GHz, 24GB RAM, 1TB PCIe SSD, HD Camera with Privacy Shutter, Wi-Fi, HDMI, Windows 11 Pro, Black".lower()]
 

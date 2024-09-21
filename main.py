@@ -1,4 +1,4 @@
-from classes import *
+from settings import *
 from time import time
 import pandas as pd
 import time
@@ -6,27 +6,28 @@ import statistics
 from datetime import datetime
 from selenium.webdriver.common.by import By
 import name_parser
+from webdriver_manager.chrome import ChromeDriverManager
+from selenium.webdriver.common.action_chains import ActionChains
+from selenium.common.exceptions import TimeoutException
+from selenium.webdriver.support.ui import WebDriverWait
+from selenium.webdriver.support import expected_conditions as EC
+from analyze_data import *
 
 time_arr=[]
 result_arr = []
-
 driver = setup_drivers_chrome()
-
 start_url = "https://www.amazon.com/s?k=laptop"
-running = True
 
-#make a variable for the results array seperately
-#or you can make it here and then return it but when I do that my computer freezes :P
-print("stared scraping")
+print("opened url")
+start_time=time.time()
 driver.get(start_url)
+
 page_num=1
 
 print("started loop")
-while page_num<10:
-    
-    # comps = WebDriverWait(driver,5).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@data-index]")))
-    start_time=time.time()
-    comps = driver.find_elements(By.XPATH, "//div[@data-index]")
+while page_num<=MAX_PAGES:
+    # time.sleep(3)
+    comps = WebDriverWait(driver,5).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@data-index]")))
     for i in comps:
         
         try:
@@ -52,31 +53,27 @@ while page_num<10:
 
     #Time Taken
     end_time = time.time()
-    page_num = page_num+1
     time_taken = round(end_time - start_time, 4)
     print("Time Taken on this page:", time_taken)
     time_arr.append(time_taken)   
   
+    page_num = page_num+1
     new_url = start_url+"&page="+str(page_num)
+    start_time = time.time()
     driver.get(url=new_url)    
     
 
 driver.quit()
 df = pd.DataFrame(result_arr)
-df.to_csv("output.csv")
+df['price'] = df['price'].str.replace('[\$,]', '', regex=True).astype(float).astype(int)
 
-average_time = statistics.mean(time_arr)
+get_basic_stats(df)
 
-now = datetime.now()
-now = now.strftime("%Y-%m-%d %H:%M:%S")
+df_filtered = df[df['name'].str.len() >= 40]
+get_basic_stats(df_filtered)
+df_filtered.to_csv("output.csv")
 
-with open('time.txt', 'w') as f:
-    f.write(
-        str({'time ran': now,
-         'time_taken': sum(time_arr),
-         'avergae_time': average_time}) + '\n'
-            )
-
+average_time = round(statistics.mean(time_arr), 4)
 
 print("Time taken: ", sum(time_arr))
-print("Average time: ",average_time)
+print("Average time: ",str(average_time)+" seconds per page")

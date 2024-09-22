@@ -1,13 +1,12 @@
 import pandas as pd
 
 break_char = [":","|", ","]
-CPU = ["m3", "m2", "m1", "intel", "amd"]
+CPU = ["m3", "m2", "m1", "i3", "i5", "i7","i9","intel", "amd"]
 storage_keyword = ["ssd","storage","emmc" ]
 GPU_keyword = ["graphics", "GPU"]
 manufacturer = ['lenovo', "apple", "dell", "hp","acer","razor", "asus"]
 
-test = ["Lenovo V15 G4 Business Laptop, 15.6\" FHD Screen, 13th Gen Intel 10 Cores i7-1355U up to 5.0GHz, 24GB RAM, 1TB PCIe SSD, HD Camera with Privacy Shutter, Wi-Fi, HDMI, Windows 11 Pro, Black".lower()]
-
+test = "HP Newest Essential 15.6\" FHD Laptop | Optimal AMD Processor for Entertainment and Personal Use | FHD Anti-Glare Display | Ethernet RJ-45 | SD Card Reader (Windows 11 Home, 16GB RAM | 1TB SSD)"
 def find_cpu(word):
     length = int (len(word))
     index = -1
@@ -23,7 +22,7 @@ def find_cpu(word):
             if temp.find(j) > -1:
                 return temp[:temp.find(j)].strip()
 
-    return "Unable to find CPU"
+    return None
     
 def find_manufacturer(word):
     for corp in manufacturer:
@@ -32,22 +31,22 @@ def find_manufacturer(word):
         elif corp in word:
             return corp.capitalize()
 
-    return "Unable to find manufacturer"
+    return None
 
 def find_ram(word):
     RAM_index = max(word.find("ram"), word.find("unified"))
-    for i in range(RAM_index, 0, -1):
+    for i in range(RAM_index, 0, -1) :
         if word[i] in break_char:
             left_break = i
             break
     for i in range(RAM_index, len(word)):
-        if word[i] in break_char:
+        if word[i] in break_char or i == len(word)-1:
             right_break = i
             break
     try:
         return word[left_break+1:right_break].strip()
     except:
-        return "Unable to find RAM"
+        return None
 
 def find_storage(word):
     ssd = word.find("ssd")
@@ -63,22 +62,24 @@ def find_storage(word):
             break
     #find break char on the right
     for i in range(storage_index, len(word)):
-        if word[i] in break_char:
+        if word[i] in break_char or i == len(word)-1:
             right_break = i
             break
 
     try:
         return word[left_break+1:right_break].strip()
     except:
-        return "Unable to find Storage"
-
+        return None
 
 def get_data(word):
-    return {"manufacturer": find_manufacturer(word), 
-            "CPU":find_cpu(word),
+    return_this = {"CPU":find_cpu(word),
             "RAM": find_ram(word), 
             "Storage":find_storage(word)
             }
+    is_full_of_none = all(value is None for value in return_this.values())
 
-# for i in test:
-#     print(get_data(i))
+    if is_full_of_none:
+        return None
+    return return_this
+
+print(get_data(test.lower()))

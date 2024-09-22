@@ -18,60 +18,75 @@ result_arr = []
 driver = setup_drivers_chrome()
 start_url = "https://www.amazon.com/s?k=laptop"
 
-print("opened url")
 start_time=time.time()
-driver.get(start_url)
+
 
 page_num=1
 
 print("started loop")
 while page_num<=MAX_PAGES:
-    # time.sleep(3)
-    comps = WebDriverWait(driver,5).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@data-index]")))
+    print("opened url")
+    new_url = start_url+"&page="+str(page_num)
+    driver.get(url=new_url) 
+
+
+    while True:
+        try:
+            comps = WebDriverWait(driver,3).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@data-index]")))
+            break
+        except TimeoutException:
+            driver.refresh()
     for i in comps:
         
+        #get the name
         try:
             name = i.find_element(By.CSS_SELECTOR, 'h2').text
             name = name.replace('\n', ' ')
         except:
             name = None
-                
+        #get the price        
         try:
             priceElement = i.find_element(By.CLASS_NAME, 'a-price').text
             price = priceElement.replace('\n', '.')
         except:
             price =None
-
+        #get the url
         try:
             url = i.find_element(By.CSS_SELECTOR, 'a.a-link-normal').get_attribute("href")
         except:
             url = None
+
+        #get the amountPurchased  
+        try:
+            amountPurchased = i.find_element(By.CSS_SELECTOR, 'div.a-row.a-size-base > span.a-size-base.a-color-secondary').text
+            #parse the amountPurchased
+            amountPurchased = amountPurchased[:amountPurchased.find("+")]
+            if amountPurchased.find("K") > -1:
+                amountPurchased = int(float(amountPurchased.replace("K",""))*1000)       
             
+        except:
+            amountPurchased = None
+        
         if name is not None and price is not None and url is not None:
             specs = name_parser.get_data(name.lower())
-            result_arr.append({"name":name,"Specs":specs,"price":price,"url":url})
+            result_arr.append({"name":name,"Specs":specs,"price":price,"url":url, "amountPurchased":amountPurchased})
 
     #Time Taken
     end_time = time.time()
     time_taken = round(end_time - start_time, 4)
-    print("Time Taken on this page:", time_taken)
+    # print("Time Taken on this page:", time_taken)
     time_arr.append(time_taken)   
   
     page_num = page_num+1
-    new_url = start_url+"&page="+str(page_num)
-    start_time = time.time()
-    driver.get(url=new_url)    
     
-
+    start_time = time.time()
+    
+# print(result_arr)
 driver.quit()
 df = pd.DataFrame(result_arr)
-df['price'] = df['price'].str.replace('[\$,]', '', regex=True).astype(float).astype(int)
+print(df.head(10))
 
-get_basic_stats(df)
-
-df_filtered = df[df['name'].str.len() >= 40]
-get_basic_stats(df_filtered)
-df_filtered.to_csv("output.csv")
+clean_data(df)
 
 average_time = round(statistics.mean(time_arr), 4)
 

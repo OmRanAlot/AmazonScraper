@@ -1,8 +1,6 @@
 from selenium import webdriver
 
-MAX_PAGES = 15
-
-
+MAX_PAGES = 20
 
 def setup_drivers_chrome():
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"
@@ -21,7 +19,7 @@ def setup_drivers_chrome():
         options.add_argument("window-size=1920,1080")
         options.add_argument("--log-level=3")  # Suppress JavaScript errors in logs
     
-        # options.add_argument('--headless')
+        options.add_argument('--headless') # it being working whenever it feels like i swear
 
         options.page_load_strategy = 'normal'
        

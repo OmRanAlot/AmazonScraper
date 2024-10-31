@@ -1,6 +1,6 @@
 import pandas as pd
 
-break_char = [":","|", ","]
+break_char = [":","|", ",", "•"]
 CPU = ["m3", "m2", "m1", "i3", "i5", "i7","i9","intel", "amd"]
 storage_keyword = ["ssd","storage","emmc" ]
 GPU_keyword = ["graphics", "GPU"]
@@ -82,4 +82,4 @@ def get_data(word):
         return None
     return return_this
 
-print(get_data(test.lower()))
+# print(get_data(test.lower()))

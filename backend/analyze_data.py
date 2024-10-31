@@ -31,6 +31,7 @@ def get_basic_stats(df):
     print("Max: ", max)
     print("Range: ", range)
     print("Standard Deviation: ", stdev)
+    print("Outliers: ", get_outliers(df))
 
 def get_outliers(df):
     q1 = df["price"].quantile(0.25)
@@ -41,27 +42,3 @@ def get_outliers(df):
     outliers = df[(df["price"] < lower_bound) | (df["price"] > upper_bound)]
     return outliers
 
-
-def clean_data(df):
-    df['price'] = df['price'].str.replace('[\$,]', '', regex=True).astype(float).astype(int)
-
-    df = df.dropna(subset=['Specs'])
-    df.reset_index(drop=True, inplace=True)
-
-    # print(df.head(10))
-    df.to_csv("output.csv")
-
-    print("Cleaned data successfully")
-
-
-
-try:
-    df = pd.read_csv("output.csv")
-except:
-    print("file not found")
-
-
-get_basic_stats(df)
-print(get_outliers(df))
-plt.boxplot(df["price"], vert=False)
-plt.show()

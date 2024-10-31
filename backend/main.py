@@ -43,18 +43,18 @@ while page_num<=MAX_PAGES:
             name = i.find_element(By.CSS_SELECTOR, 'h2').text
             name = name.replace('\n', ' ')
         except:
-            name = None
+            name = ""
         #get the price        
         try:
             priceElement = i.find_element(By.CLASS_NAME, 'a-price').text
             price = priceElement.replace('\n', '.')
         except:
-            price =None
+            price = -1
         #get the url
         try:
             url = i.find_element(By.CSS_SELECTOR, 'a.a-link-normal').get_attribute("href")
         except:
-            url = None
+            url = ""
 
         #get the amountPurchased  
         try:
@@ -63,13 +63,37 @@ while page_num<=MAX_PAGES:
             amountPurchased = amountPurchased[:amountPurchased.find("+")]
             if amountPurchased.find("K") > -1:
                 amountPurchased = int(float(amountPurchased.replace("K",""))*1000)       
-            
+            if amountPurchased == "More Buying Choice":
+                amountPurchased = -1
         except:
-            amountPurchased = None
-        
-        if name is not None and price is not None and url is not None:
+            amountPurchased = -1
+
+        #get reviews
+    
+        try:
+            review = i.find_element(By.XPATH, ".//span[contains(@aria-label, 'out of 5 stars')]").get_attribute("aria-label")
+            review = int(review[:3])
+        except:
+            review = ""
+
+        # get number of reviews
+        try:
+            numberOfReviews = i.find_element(By.XPATH, ".//span[contains(@aria-label, 'ratings')]").get_attribute("aria-label")
+        except:
+            numberOfReviews = -1
+
+        try:
             specs = name_parser.get_data(name.lower())
-            result_arr.append({"name":name,"Specs":specs,"price":price,"url":url, "amountPurchased":amountPurchased})
+        except:
+            specs = {}
+        finally:
+            result_arr.append({"name":name,
+                               "Specs":specs,
+                               "price":price,
+                               "url":url, 
+                               "amountPurchased":amountPurchased,
+                               "review":review,
+                               "numberOfReviews":numberOfReviews})
 
     #Time Taken
     end_time = time.time()
@@ -85,9 +109,7 @@ while page_num<=MAX_PAGES:
 driver.quit()
 df = pd.DataFrame(result_arr)
 print(df.head(10))
-
 clean_data(df)
-
 average_time = round(statistics.mean(time_arr), 4)
 
 print("Time taken: ", sum(time_arr))

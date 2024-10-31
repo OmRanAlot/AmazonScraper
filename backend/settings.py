@@ -1,6 +1,6 @@
 from selenium import webdriver
 
-MAX_PAGES = 20
+MAX_PAGES = 5
 
 def setup_drivers_chrome():
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"
@@ -25,4 +25,16 @@ def setup_drivers_chrome():
        
         return webdriver.Chrome(options=options)
 
+def clean_data(df):
+    try:
+        df['price'] = df['price'].str.replace('[\$,]', '', regex=True).astype(float).astype(int)
+        
+    except:
+        pass
+    df = df.dropna(subset=['Specs'])
+    df.reset_index(drop=True, inplace=True)
 
+    # print(df.head(10))
+    df.to_csv("output.csv")
+
+    print("Cleaned data successfully")

@@ -1,0 +1,61 @@
+body {
+    background-color: #000000;
+    font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+}
+
+h1 {
+    color: rgb(90, 189, 255);
+    text-align: center;
+    font-size: 50px;
+}
+
+form {
+    font-size: 24px;
+    display: flex;
+    flex-direction: column;
+    justify-content:space-evenly;
+    align-items: center;
+    outline: none;
+    border: none;
+
+}
+
+/* Search Bars */
+.search-input{
+    border-radius: 10px;
+    font-size: large;
+    background-color: #E6E6E9;
+    padding: 10px;
+}
+.search-bar{
+    margin:5px;
+    background-color:#E6E6E9;
+    border-radius: 10px;
+}
+
+
+#myButton {
+    margin: 10px;
+    text-align: center;
+    text-decoration: none;
+    font-size: 16px;
+    border-radius: 10px;
+    color: #000000;
+}
+#myButton:hover {    
+    background-color: #9999A1;
+    transition: 500ms ease-in-out;
+}
+
+table, th, td {
+    color: #E6E6E9;
+  }
+
+/* colors hex
+000000 
+66666E
+9999A1
+E6E6E9
+90, 189, 255 rgb
+
+*/

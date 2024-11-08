@@ -17,33 +17,39 @@
     <div>
         <h1>Amazon Web Scraper</h1>
     </div>
-    <form id="form" method="POST">
+    <form id="form" method="GET">
         <div class="search-bar">
-            <input autocomplete="off" class="search-input" id="input-item" name="itemInput" type="text"
+            <input autocomplete="off" class="search-input" name="itemInput" type="text"
                 placeholder="Search Name">
         </div>
         <div class="search-bar">
-            <input autocomplete="off" class="search-input" id="input-pages" name="userInput" type="text"
+            <input autocomplete="off" class="search-input" name="userInput" type="text"
                 placeholder="Number of Pages">
         </div>
         <button id="myButton" type="submit">Scrape</button>
 
     </form>
     <div id="results">
-        <h1> {{ working }}</h1>
+        <h1>Data</h1>
         <table>
             <tr>
                 <th>Name</th>
-                <th>Specs</th>
                 <th>Price</th>
                 <th>Url</th>
+                <th>Amount Purchased</th>
+                <th>Review</th>
+                <th>Number of Reviews</th>
             </tr>
             {% for row in data %}
-            <tr>
-                <td>{{ row[0] }}</td>
-                <td>{{ row[1] }}</td>
-                <td>{{ row[2] }}</td>
-                <td>{{ row[3] }}</td>
+            <tr id="row-{{ loop.index }}">
+                <td id="name">{{ row['name'] }}</td>
+                <td id="price">{{ row['price'] }}</td>
+                <td id="url">
+                    <a href="{{ row['url'] }}">Link</a>
+                    </td>
+                <td id="amountPurchased">{{ row['amountPurchased'] }}</td>
+                <td id="review">{{ row['review'] }}</td>
+                <td id="numberOfReviews">{{ row['numberOfReviews'] }}</td>
             </tr>
             {% endfor %}
         </table>

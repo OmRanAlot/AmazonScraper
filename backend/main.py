@@ -4,9 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 import pandas as pd
-# result_arr = []
-# driver = setup_drivers_chrome()
-# start_url = "https://www.amazon.com/s?k=laptop"
+
 
 
 def get_data(item, maxPages):
@@ -131,8 +129,11 @@ def clean_data(df):
 
     print("Cleaning data...")
     # df = df.dropna(subset=['Specs'])
-    # df['numberOfReviews'] = df[df['numberOfReviews'] != -1]
+    df = df[df['numberOfReviews'] != -1]
     print("Cleaning data2.....")
+
+    df = df[~df['name'].str.contains("customers|consider", case=False, na=False)]
+        
 
     df.reset_index(drop=True, inplace=True)
     result_arr = df.to_dict('records')

@@ -5,12 +5,11 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 import pandas as pd
 
-
-
 def get_data(item, maxPages):
+    maxPages = int(str(maxPages))
+
     print("opened function!")
-    if not maxPages.isdigit():
-        return
+ 
     result_arr = []
     driver = setup_drivers_chrome()
     start_url = "https://www.amazon.com/s?k="+str(item)
@@ -94,7 +93,7 @@ def get_data(item, maxPages):
 
     driver.quit()
     df = pd.DataFrame(result_arr)
-    return df
+    return clean_data(df)
    
 
 def setup_drivers_chrome():
@@ -141,7 +140,8 @@ def clean_data(df):
 
     return result_arr
 
-
+if __name__ == "__main__":
+    print(clean_data(get_data("laptops",2)))
 
 # page_num=1
 

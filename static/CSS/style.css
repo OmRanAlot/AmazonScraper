@@ -32,8 +32,7 @@ form {
     background-color:#E6E6E9;
     border-radius: 10px;
 }
-
-
+/* Button Styles*/
 #myButton {
     margin: 10px;
     text-align: center;
@@ -49,8 +48,33 @@ form {
 
 table, th, td {
     color: #E6E6E9;
-    
 }
+
+table{
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    border-collapse: collapse;
+
+}
+th{
+    align-self: center;
+    font-size: 20px;
+    color: rgb(90, 189, 255);
+}
+
+
+#url{
+    color: rgb(90, 189, 255);
+}
+
+#name{
+    width: 500px;
+}
+
+
+
+
 
 /* colors hex
 000000 

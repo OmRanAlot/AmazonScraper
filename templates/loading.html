@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Loading...</title>
     <style>
+        body {
+            background-color: #000000;
+            font-family: 'Trebuchet MS', 'Lucida Sans Unicode', 'Lucida Grande', 'Lucida Sans', Arial, sans-serif;
+        }
+
         #loadingOverlay {
             position: fixed;
             top: 0;
@@ -30,8 +35,22 @@
             0% { transform: rotate(0deg); }
             100% { transform: rotate(360deg); }
         }
+
     </style>
-    <script defer src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.min.js"></script>
+  
+</head>
+<body>
+    <div id="header">
+        <h1>Amazon Web Scraper</h1>
+    </div>
+
+    <div id="loadingOverlay">
+        <div class="spinner"></div>
+    </div>
+
+
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.7.1/socket.io.min.js"></script>
     <script>
         const socket = io();
 
@@ -44,10 +63,6 @@
 
         });
     </script>
-</head>
-<body>
-    <div id="loadingOverlay">
-        <div class="spinner"></div>
-    </div>
+
 </body>
 </html>

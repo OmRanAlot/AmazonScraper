@@ -1,21 +1,23 @@
+from gevent import monkey
+monkey.patch_all() #patches the standard library modules before they are imported
+
+from gevent.pywsgi import WSGIServer
+from geventwebsocket.handler import WebSocketHandler
 from flask import Flask, render_template, request, url_for, redirect, jsonify
 from flask_cors import CORS
-from backend.scraper import get_data, clean_data
-import random
-import asyncio
+from backend.scraper import get_data
 from flask_socketio import SocketIO
 import settings
 
+#create flask app
 app = Flask(__name__, template_folder="templates")
 app.config['SECRET_KEY'] = settings.SECRET_KEY
 
+#create socketio app so python can communicate with the frontend
 socketio = SocketIO(app)
-
 scraped_data = None
 
 # https://www.geeksforgeeks.org/post-redirect-get-prg-design-pattern/#
-
-
 
 @app.route("/", methods=["GET"])
 def home():
@@ -29,7 +31,7 @@ def scrape():
 
     print(item_input, page_input)
 
-    # Perform your scraping or processing logic here
+    # starts scraping in bkgd
     socketio.start_background_task(scraping_task, item_input, page_input)
         
     # Pass data back to the template
@@ -45,6 +47,7 @@ def scraping_task(item, pages):
     scraped_data = get_data(item, pages)
 
     # Notify the client that scraping is complete
+    print("scraping complete")
     socketio.emit("scraping_complete")
 
 @app.route("/test")
@@ -52,4 +55,9 @@ def test():
     return "flask is running"
 
 if __name__ == "__main__":
+    http_server = WSGIServer(('0.0.0.0', 5000), app, handler_class=WebSocketHandler)
     socketio.run(app, debug=True, port=5001)
+
+
+#url is 
+# http://127.0.0.1:5001/

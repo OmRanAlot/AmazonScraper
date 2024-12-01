@@ -5,15 +5,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Amazenon</title>
-    <script defer src="../static/JS/source.js"></script>
+    <script src="../static/JS/redirect.js"></script>
     <link rel="stylesheet" href="../static/CSS/style.css">
     <link rel="stylesheet"
         href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@48,400,0,0&icon_names=search" />
     <style>
         .fly-in {
-            animation: cubic-bezier(.06,.35,.12,1.05) flyInFromBottom 3s;
-            animation-fill-mode: forwards;
-            /* animation: fadeIn 1s ease-in; */
+            /* animation: cubic-bezier(.06,.35,.12,1.05) flyInFromBottom 3s;
+            animation-fill-mode: forwards; */
+            animation: fadeIn 1s ease-in-out;
             border: 3px solid #9999A1;
             padding: 5px;
         }
@@ -58,12 +58,11 @@
 </head>
 
 <body>
-    <div>
+    <div id="main-header">
         <h1>Amazon Web Scraper</h1>
     </div>    
 
     <div id="results">
-        <h1>Data</h1>
         <table id ="results-table">
             <tr>
                 <th>Name</th>
@@ -88,53 +87,5 @@
 
     </div>
 
-    <div id="results2"></div>
-    <!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Flask Scraper</title>
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
-    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
-</head>
-<body>
-    <div class="container">
-        <h1>Welcome to the Scraper</h1>
- 
-        <div id="results">
-            <h1>Data</h1>
-            <table id ="results-table">
-                <tr>
-                    <th>Name</th>
-                    <th>Price</th>
-                    <th>Review</th>
-                    <th>Number of Reviews</th>
-                    <th>Url</th>
-    
-                </tr>
-                {% for row in data %}
-                <tr id="row-{{ loop.index }}" class="fade-in">
-                    <td class="fly-in" id="name">{{ row['name'] }} </td>
-                    <td class="fly-in" id="price">{{ row['price'] }}</td>
-                    <td class="fly-in" id="review">{{ row['review'] }}</td>
-                    <td class="fly-in" id="numberOfReviews">{{ row['numberOfReviews'] }}</td>
-                    <td class="fly-in">
-                        <a id="url" href="{{ row['url'] }}">Link</a>
-                    </td>
-                </tr>
-                {% endfor %}
-            </table>
-    
-        </div>
-        
-    </div>
-
-    
 </body>
-</html>
-
-
-</body>
-
 </html>

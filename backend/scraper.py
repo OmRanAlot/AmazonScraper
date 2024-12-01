@@ -95,7 +95,6 @@ def get_data(item, maxPages):
     df = pd.DataFrame(result_arr)
     return clean_data(df)
    
-
 def setup_drivers_chrome():
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"
 
@@ -132,7 +131,7 @@ def clean_data(df):
     print("Cleaning data2.....")
 
     df = df[~df['name'].str.contains("customers|consider", case=False, na=False)]
-        
+    df = df[df['name'].str.len() > 70]    
 
     df.reset_index(drop=True, inplace=True)
     result_arr = df.to_dict('records')

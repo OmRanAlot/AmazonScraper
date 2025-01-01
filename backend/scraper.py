@@ -21,16 +21,16 @@ def get_data(item, maxPages):
         driver.get(url=new_url) 
 
         #get all the computer elements or refresh if cant find any
-        while True:
-            try:
-                comps = WebDriverWait(driver,3).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@data-index]")))
-                break
-            except TimeoutException:
-                driver.refresh()
-       
+        # while True:
+        #     try:
+        #         comps = WebDriverWait(driver,3).until(EC.visibility_of_all_elements_located((By.XPATH, "//div[@data-index > 1]")))
+        #         break
+        #     except TimeoutException:
+        #         driver.refresh()
+        elements = driver.find_elements(By.XPATH, "//div[@data-index > 1]")
+
         #get the data for each computer
-        for i in comps:
-            
+        for i in elements:
             #get the name
             try:
                 name = i.find_element(By.CSS_SELECTOR, 'h2').text
@@ -64,14 +64,19 @@ def get_data(item, maxPages):
             #get reviews
         
             try:
-                review = i.find_element(By.XPATH, ".//span[contains(@aria-label, 'out of 5 stars')]").get_attribute("aria-label")
-                review = int(review[:3])
+                # review = i.find_element(By.XPATH, "//a[contains(@class, 'a-popover-trigger')]").get_attribute("aria-label")
+                # review = i.find_element(By.CSS_SELECTOR, "div.a-row.a-size-small > span.a-declarative > a[aria-label]")
+                review = i.find_element(By.XPATH, ".//span[@class='a-icon-alt']").get_attribute("innerHTML")
+                #string
+                
             except:
                 review = ""
 
             # get number of reviews
             try:
-                numberOfReviews = i.find_element(By.XPATH, ".//span[contains(@aria-label, 'ratings')]").get_attribute("aria-label")
+                # numberOfReviews = i.find_element(By.XPATH, "//span[contains(@class, 'a-size-small puis-normal-weight-text s-underline-text')]")
+                numberOfReviews = i.find_element(By.CSS_SELECTOR, "div.a-row.a-size-small > span:nth-of-type(2) > div > a > span").get_attribute("innerHTML")
+                
             except:
                 numberOfReviews = -1
 
@@ -90,9 +95,11 @@ def get_data(item, maxPages):
                                 "numberOfReviews":numberOfReviews})
        
         page_num = page_num+1
+        
 
     driver.quit()
     df = pd.DataFrame(result_arr)
+    print(df)
     return clean_data(df)
    
 def setup_drivers_chrome():
@@ -127,20 +134,20 @@ def clean_data(df):
 
     print("Cleaning data...")
     # df = df.dropna(subset=['Specs'])
-    df = df[df['numberOfReviews'] != -1]
+    # df = df[df['numberOfReviews'] != -1]
     print("Cleaning data2.....")
 
     df = df[~df['name'].str.contains("customers|consider", case=False, na=False)]
-    df = df[df['name'].str.len() > 70]    
+    df = df[df['name'].str.len() > 30]    
 
     df.reset_index(drop=True, inplace=True)
     result_arr = df.to_dict('records')
     print("Cleaned data successfully")
-
+    # print(result_arr)
     return result_arr
 
 if __name__ == "__main__":
-    print(clean_data(get_data("laptops",2)))
+    get_data("laptops",1)
 
 # page_num=1
 

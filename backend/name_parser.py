@@ -6,7 +6,7 @@ storage_keyword = ["ssd","storage","emmc" ]
 GPU_keyword = ["graphics", "GPU"]
 manufacturer = ['lenovo', "apple", "dell", "hp","acer","razor", "asus"]
 
-test = "HP Newest Essential 15.6\" FHD Laptop | Optimal AMD Processor for Entertainment and Personal Use | FHD Anti-Glare Display | Ethernet RJ-45 | SD Card Reader (Windows 11 Home, 16GB RAM | 1TB SSD)"
+test = "ASUS ROG Strix G16 (2024) Gaming Laptop, 16” 16:10 FHD 165Hz Display, NVIDIA® GeForce RTX™ 4060, Intel Core i7-13650HX, 16GB DDR5, 1TB PCIe Gen4 SSD, Wi-Fi 6E, Windows 11, G614JV-AS74	"
 def find_cpu(word):
     length = int (len(word))
     index = -1
@@ -34,7 +34,7 @@ def find_manufacturer(word):
     return None
 
 def find_ram(word):
-    RAM_index = max(word.find("ram"), word.find("unified"))
+    RAM_index = max(word.find("ram"), max(word.find("unified"), word.find("ddr5")))
     for i in range(RAM_index, 0, -1) :
         if word[i] in break_char:
             left_break = i
@@ -71,7 +71,7 @@ def find_storage(word):
     except:
         return None
 
-def get_data(word):
+def get_specs(word):
     return_this = {"CPU":find_cpu(word),
             "RAM": find_ram(word), 
             "Storage":find_storage(word)
@@ -82,4 +82,4 @@ def get_data(word):
         return None
     return return_this
 
-# print(get_data(test.lower()))
+# print(get_specs(test.lower()))

@@ -79,7 +79,17 @@
             {% for row in data %}
             <tr id="row-{{ loop.index }}" class="fade-in">
                 <td class="fly-in" id="name">{{ row['name'] }} </td>
-                <td class="fly-in" id="specs">{{ row['specs'] }}"></td>
+                <td class="fly-in" id="specs">
+                    {% if row.get('specs') %}
+                        <ul>
+                            {% for i in row['specs'] %}
+                                <li>{{ row['specs'][i] }}</li>
+                            {% endfor %}
+                        </ul>
+                    {% else %}
+                        N/A
+                    {% endif %}
+                </td>
                 <td class="fly-in" id="price">{{ row['price'] }}</td>
                 <td class="fly-in" id="review">{{ row['review'] }}</td>
                 <td class="fly-in" id="numberOfReviews">{{ row['numberOfReviews'] }}</td>

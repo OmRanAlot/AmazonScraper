@@ -5,8 +5,10 @@ from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 import pandas as pd
 from backend.name_parser import get_specs
+import csv
+import os
 
-def get_data(item, maxPages):
+def get_data(item, maxPages, database=None):
     maxPages = int(str(maxPages))
 
     print("opened function!")
@@ -82,26 +84,36 @@ def get_data(item, maxPages):
                 numberOfReviews = -1
 
             try:
-                specs = get_specs(name.lower())
+                specs = get_specs(name)
                 pass
             except:
                 specs = {}
             finally:
-                result_arr.append({"name":name,
+                results = {"name":name,
                                 "specs":specs,
                                 "price":price,
                                 "url":url, 
                                 "amountPurchased":amountPurchased,
                                 "review":review,
-                                "numberOfReviews":numberOfReviews})
-       
+                                "numberOfReviews":numberOfReviews}
+                #add to firebase 
+               
+                # if database is not None:
+                #     database.collection("laptops").add(results)
+
+                
+                result_arr.append(results)
+
         page_num = page_num+1
         
 
     driver.quit()
-    df = pd.DataFrame(result_arr)
-    print(df)
-    return clean_data(df)
+    df = clean_data(pd.DataFrame(result_arr))
+
+
+    pd.DataFrame(df).to_csv('output.csv', mode='a', index=False)
+
+    return df
    
 def setup_drivers_chrome():
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"
@@ -138,8 +150,14 @@ def clean_data(df):
     # df = df[df['numberOfReviews'] != -1]
     print("Cleaning data2.....")
 
+    # remove rows with "customers" or "consider" in the name
     df = df[~df['name'].str.contains("customers|consider", case=False, na=False)]
-    df = df[df['name'].str.len() > 30]    
+    
+    # remove rows with names that are too short
+    df = df[df['name'].str.len() > 30]   
+    
+    # remove rows with prices that are too low
+    df = df[df['price'] > 30] 
 
     df.reset_index(drop=True, inplace=True)
     result_arr = df.to_dict('records')

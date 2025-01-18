@@ -8,7 +8,7 @@ from backend.name_parser import get_specs
 import csv
 import os
 
-def get_data(item, maxPages, database=None):
+def get_data(item, maxPages):
     maxPages = int(str(maxPages))
 
     print("opened function!")
@@ -108,10 +108,22 @@ def get_data(item, maxPages, database=None):
         
 
     driver.quit()
-    df = clean_data(pd.DataFrame(result_arr))
+    try:
+        df = clean_data(pd.DataFrame(result_arr))
+        save = pd.DataFrame(df)
+    except:
+        save = pd.DataFrame(result_arr)
+    
 
+    try:
+        save["CPU"] = save["specs"].apply(lambda x: x.get("CPU"))
+        save["GPU"] = save["specs"].apply(lambda x: x.get("GPU"))
+        save["RAM"] = save["specs"].apply(lambda x: x.get("RAM"))
+        save["Storage"] = save["specs"].apply(lambda x: x.get("Storage"))
+    except:
+        pass
 
-    pd.DataFrame(df).to_csv('output.csv', mode='a', index=False)
+    save.to_csv('output.csv', mode='a', index=False)
 
     return df
    
@@ -140,10 +152,9 @@ def setup_drivers_chrome():
         return webdriver.Chrome(options=options)
 
 def clean_data(df):
-    try:
-        df['price'] = df['price'].str.replace('[\$,]', '', regex=True).astype(float).astype(int)
-    except:
-        pass
+    
+    df['price'] = df['price'].str.replace('[\$,]', '', regex=True)
+    df['price'] = pd.to_numeric(df['price'], errors='coerce')
 
     print("Cleaning data...")
     # df = df.dropna(subset=['Specs'])

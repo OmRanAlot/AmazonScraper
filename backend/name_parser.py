@@ -1,7 +1,7 @@
 import pandas as pd
 
 break_char = [":","|", ",", "•"]
-CPU = ["core", "m4", "m3", "m2", "m1", "i3", "i5", "i7","i9","intel", "amd", "cpu", "ryzen"]
+CPU = ["core", "m4", "m3", "m2", "m1", "i3", "i5", "i7","i9","intel", "amd", "cpu", "ryzen", "processor"]
 storage_keyword = ["ssd","storage","emmc", "hdd"]
 GPU = ["graphics", "gpu", "rtx", "geforce"]
 manufacturer = ['lenovo', "apple", "dell", "hp","acer","razor", "asus"]
@@ -31,14 +31,14 @@ def find_cpu(word):
     
     return None
     
-def find_manufacturer(word):
-    for corp in manufacturer:
-        if corp in word and corp =="hp":
-            return "HP"
-        elif corp in word:
-            return corp.capitalize()
+# def find_manufacturer(word):
+#     for corp in manufacturer:
+#         if corp in word and corp =="hp":
+#             return "HP"
+#         elif corp in word:
+#             return corp.capitalize()
 
-    return None
+#     return None
 
 def find_ram(word):
     temp = word.lower()

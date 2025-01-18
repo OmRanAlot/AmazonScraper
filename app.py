@@ -8,13 +8,6 @@ from flask_cors import CORS
 from backend.scraper import get_data
 from flask_socketio import SocketIO
 import settings
-import firebase_admin
-from firebase_admin import credentials
-from firebase_admin import firestore
-
-cred = credentials.Certificate("C:\code\AmazonScraper\laptop-price-predictor-217c1-firebase-adminsdk-dvsp5-aa8cd1ebed.json")
-firebase_admin.initialize_app(cred)
-db = firestore.client()
 
 #create flask app
 app = Flask(__name__, template_folder="templates")
@@ -52,7 +45,7 @@ def results():
 
 def scraping_task(item, pages):
     global scraped_data
-    scraped_data = get_data(item, pages, database=db)
+    scraped_data = get_data(item, pages)
     print(scraped_data)
     # Notify the client that scraping is complete
     print("scraping complete")

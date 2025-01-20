@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium import webdriver
 import pandas as pd
-from backend.name_parser import get_specs
+from name_parser import get_specs
 import csv
 import os
 
@@ -34,76 +34,9 @@ def get_data(item, maxPages):
 
         #get the data for each computer
         for i in comps:
-            #get the name
-            try:
-                name = i.find_element(By.CSS_SELECTOR, 'h2').text
-                name = name.replace('\n', ' ')
-            except:
-                name = ""
-            #get the price        
-            try:
-                priceElement = i.find_element(By.CLASS_NAME, 'a-price').text
-                price = priceElement.replace('\n', '.')
-            except:
-                price = -1
-            #get the url
-            try:
-                url = i.find_element(By.CSS_SELECTOR, 'a.a-link-normal').get_attribute("href")
-            except:
-                url = ""
-
-            #get the amountPurchased  
-            try:
-                amountPurchased = i.find_element(By.CSS_SELECTOR, 'div.a-row.a-size-base > span.a-size-base.a-color-secondary').text
-                #parse the amountPurchased
-                amountPurchased = amountPurchased[:amountPurchased.find("+")]
-                if amountPurchased.find("K") > -1:
-                    amountPurchased = int(float(amountPurchased.replace("K",""))*1000)       
-                if amountPurchased == "More Buying Choice":
-                    amountPurchased = -1
-            except:
-                amountPurchased = -1
-
-            #get reviews
-        
-            try:
-                # review = i.find_element(By.XPATH, "//a[contains(@class, 'a-popover-trigger')]").get_attribute("aria-label")
-                # review = i.find_element(By.CSS_SELECTOR, "div.a-row.a-size-small > span.a-declarative > a[aria-label]")
-                review = i.find_element(By.XPATH, ".//span[@class='a-icon-alt']").get_attribute("innerHTML")
-                #string
-                
-            except:
-                review = ""
-
-            # get number of reviews
-            try:
-                # numberOfReviews = i.find_element(By.XPATH, "//span[contains(@class, 'a-size-small puis-normal-weight-text s-underline-text')]")
-                numberOfReviews = i.find_element(By.CSS_SELECTOR, "div.a-row.a-size-small > span:nth-of-type(2) > div > a > span").get_attribute("innerHTML")
-                
-            except:
-                numberOfReviews = -1
-
-            try:
-                specs = get_specs(name)
-                pass
-            except:
-                specs = {}
-            finally:
-                results = {"name":name,
-                                "specs":specs,
-                                "price":price,
-                                "url":url, 
-                                "amountPurchased":amountPurchased,
-                                "review":review,
-                                "numberOfReviews":numberOfReviews}
-                #add to firebase 
-               
-                # if database is not None:
-                #     database.collection("laptops").add(results)
-
-                
-                result_arr.append(results)
-
+            result_arr.append(get_data_from_element(i))
+            
+            
         page_num = page_num+1
         
 
@@ -127,6 +60,48 @@ def get_data(item, maxPages):
 
     return df
    
+
+def get_data_from_element(element):
+
+    def safe_extract(element, selectorType, selector, attr=None, default=""):
+        try:
+            x = element.find_element(selectorType, selector)
+            return x.get_attribute(attr) if attr else x.text
+        except:
+            return default
+
+
+    name = safe_extract(element, By.CSS_SELECTOR, 'h2', attr="innerText").replace('\n', ' ')
+    price = str(safe_extract(element, By.CLASS_NAME, 'a-price', default= -1)).replace('\n', '.')
+    url = safe_extract(element, By.CSS_SELECTOR, 'a.a-link-normal', attr="href", default="")
+    amountPurchased = safe_extract(element, By.CSS_SELECTOR, 'div.a-row.a-size-base > span.a-size-base.a-color-secondary', default=-1)
+    review = safe_extract(element, By.XPATH, ".//span[@class='a-icon-alt']", attr="innerHTML")
+    numberOfReviews = safe_extract(element, By.CSS_SELECTOR, "div.a-row.a-size-small > span:nth-of-type(2) > div > a > span", attr="innerHTML", default=-1)
+    specs = get_specs(name)
+    
+    try:
+        amountPurchased = amountPurchased[:amountPurchased.find("+")]
+        if amountPurchased.find("K") > -1:
+            amountPurchased = int(float(amountPurchased.replace("K",""))*1000)       
+        if amountPurchased == "More Buying Choice":
+            amountPurchased = -1
+    except:
+        pass
+
+    print(name, specs, price, url, amountPurchased, review, numberOfReviews)
+    return {"name":name,
+            "specs":specs,
+            "price":price,
+            "url":url, 
+            "amountPurchased":amountPurchased,
+            "review":review,
+            "numberOfReviews":numberOfReviews
+    }
+
+
+def save_to_csv(dataframe):
+    dataframe.to_csv('output.csv', mode='a', index=False)
+
 def setup_drivers_chrome():
         user_agent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/97.0.4692.71 Safari/537.36"
 
@@ -144,6 +119,7 @@ def setup_drivers_chrome():
         options.add_argument("window-size=1920,1080")
         options.add_argument("--log-level=3")  # Suppress JavaScript errors in logs
         options.add_argument("--enable-unsafe-swiftshader")
+        options.add_argument("--blink-settings=imagesEnabled=false")  # Disable images
 
         options.add_argument('--headless') # it being working whenever it feels like i swear
 
@@ -152,14 +128,8 @@ def setup_drivers_chrome():
         return webdriver.Chrome(options=options)
 
 def clean_data(df):
-    
     df['price'] = df['price'].str.replace('[\$,]', '', regex=True)
     df['price'] = pd.to_numeric(df['price'], errors='coerce')
-
-    print("Cleaning data...")
-    # df = df.dropna(subset=['Specs'])
-    # df = df[df['numberOfReviews'] != -1]
-    print("Cleaning data2.....")
 
     # remove rows with "customers" or "consider" in the name
     df = df[~df['name'].str.contains("customers|consider", case=False, na=False)]
@@ -173,9 +143,13 @@ def clean_data(df):
     df.reset_index(drop=True, inplace=True)
     result_arr = df.to_dict('records')
     print("Cleaned data successfully")
-    # print(result_arr)
     return result_arr
 
 if __name__ == "__main__":
-    get_data("laptops",1)
-
+    get_data("laptop",20)
+    get_data("laptops with ryzen CPU",20)
+    get_data("laptops with GPU",20)
+    get_data("laptops with intel CPU",20)
+    get_data("laptops with AMD CPU",20)
+    get_data("laptops with 16gb RAM",20)
+    get_data("laptops with 32gb RAM",20)

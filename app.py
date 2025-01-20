@@ -40,13 +40,13 @@ def scrape():
 @app.route("/results", methods=["GET"])
 def results():
     global scraped_data
-    print(scraped_data)
+    # print(scraped_data)
     return render_template("landing.html", data=scraped_data)
 
 def scraping_task(item, pages):
     global scraped_data
     scraped_data = get_data(item, pages)
-    print(scraped_data)
+    # print(scraped_data)
     # Notify the client that scraping is complete
     print("scraping complete")
     socketio.emit("scraping_complete")

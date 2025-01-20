@@ -1,112 +1,76 @@
 import pandas as pd
+import re
 
-break_char = [":","|", ",", "•"]
-CPU = ["core", "m4", "m3", "m2", "m1", "i3", "i5", "i7","i9","intel", "amd", "cpu", "ryzen", "processor"]
-storage_keyword = ["ssd","storage","emmc", "hdd"]
-GPU = ["graphics", "gpu", "rtx", "geforce"]
-manufacturer = ['lenovo', "apple", "dell", "hp","acer","razor", "asus"]
+#gpu
+test = "Gaming Laptop, Laptop with AMD Ryzen 7 5825U (8C/16T, Up to 4.5GHz), 16GB RAM 512GB NVMe SSD Laptop Computer, Radeon RX Vega 8 Graphics, 16.1-inch FHD Display, WiFi 6, 53Wh Battery, Backlit KB	"
 
-test = "ASUS ROG Strix G16 (2024) Gaming Laptop, 16” 16:10 FHD 165Hz Display, NVIDIA® GeForce RTX™ 4060, Intel Core i7-13650HX, 16GB DDR5, 1TB PCIe Gen4 SSD, Wi-Fi 6E, Windows 11, G614JV-AS74"
 def find_cpu(word):
-    temp = word.lower()
-    
-    index = -1
-    for keyword in CPU:
-        current_index = temp.find(keyword)
-        if (index == -1 and current_index != -1) or (current_index != -1 and current_index < index):
-            index = current_index
+    '''
+    \d{3,5}[A-Za-z]{1,3} -> 3=5 numbers followed by 1-3 letters eg - 1234AB
+    '''
 
-    if index > -1:
-        # Move backward to find the start of the phrase (e.g., "8-Cores Intel Core i3")
-        start = index
-        while start > 0 and temp[start - 1] not in break_char:
-            start -= 1
-        
-        # Move forward to find the end of the phrase
-        end = index + 1
-        while end < len(temp) and temp[end] not in break_char:
-            end += 1
-        
-        return word[start:end].strip()
+    # expression = r'(?:(?:amd|intel|ryzen)[\S\s]*?(?:\d{3,5}[A-Za-z]{1,3}|[A-Za-z]{1}\d+)|(?:\S+)?Core[\S\s]*?(?:cpu|processor)|m\d(?:max)?|n5095 [\S\s]*?(?:cpu|processor|\)))'
+    # expression1 = r'(?:\S+)?Core[\S\s]*?(?:\d{3,5}[A-Za-z]{1,3}|[A-Za-z]{1}\d+)' #has keyword "core"
+    # expression2 = r'(?:amd|intel|ryzen)[\S\s]*?(?:\d{3,5}[A-Za-z]{1,3}|[A-Za-z]{1}\d+)' #has no keyword "core"
+    # expression3 = r'(?:amd|intel) [\S\s]*? (?:cpu|processor)'
+    # expression4 = r'(?:\S+)?Core[\S\s]*?(?:cpu|processor)'
+   
+    patterns = [
+        r'm\d (?:max)?', #Apple M series chips
+        r'(?:amd|intel|ryzen|(?:\S+)?Core)[\S\s]*?\d{4,5}[A-Za-z]{1,3}(\d)?', #Major specic AMD/Intel CPUs with numbers and specifics(like AMD Ryzen 5 5500X or i7-12300X)
+        r'(?:amd|intel|ryzen|(?:\S+)?Core)[\S\s]*?[A-Za-z]{1}\d+',
+        r'(?:amd|intel|(?:\S+)?Core)[\S\s]*?(?:cpu|processor|core)', #Major specic AMD/Intel CPUs without numbers and specfics(like AMD Ryzen 5 or Intel 4-core CPU)
+        r'n\d+ ([\S\s]*? (?:cpu|processor|\)))?' #Intel N series chips
+    ]
+
+
     
+    for p in patterns:
+        match = re.search(p,word, re.IGNORECASE)
+        if match and len(match.group()) < 40:
+            return match.group()
+ 
     return None
-    
-# def find_manufacturer(word):
-#     for corp in manufacturer:
-#         if corp in word and corp =="hp":
-#             return "HP"
-#         elif corp in word:
-#             return corp.capitalize()
 
-#     return None
 
-def find_ram(word):
-    temp = word.lower()
-
-    RAM_index = max(temp.find("ram"), max(temp.find("unified"), max(temp.find("ddr5"), temp.find("ddr4"))))    #find break char on the left
-
-    for i in range(RAM_index, 0, -1) :
-        if temp[i] in break_char:
-            left_break = i
-            break
-    #find break char on the right
-    for i in range(RAM_index, len(temp)):
-        if temp[i] in break_char or i == len(temp)-1 or temp[i] == " ":
-            right_break = i
-            break
-    try:
-        return word[left_break+1:right_break].strip()
-    except:
-        return None
-
-def find_storage(word):
-    temp = word.lower()
-    ssd = temp.find("ssd")
-    storage = temp.find("storage")
-    emmc = temp.find("emmc")
-    storage_index = ssd if ssd>-1 else storage if storage>-1 else emmc
-    
-    ram_index = max(temp.find("ram"), max(temp.find("unified"), max(temp.find("ddr5"), temp.find("ddr4"))))
-    #find break char on the left
-    for i in range(storage_index, 0, -1):
-        if temp[i] in break_char or i == ram_index+2:
-            left_break = i
-            break
-    #find break char on the right
-    for i in range(storage_index, len(temp)):
-        if temp[i] in break_char or i == len(temp)-1:
-            right_break = i
-            break
-
-    try:
-        return word[left_break+1:right_break].strip()
-    except:
-        return None
 
 def find_GPU(word):
-    temp = word.lower()
-    index = -1
-    for keyword in GPU:
-        current_index = temp.find(keyword)
-        if (index == -1 and current_index != -1) or (current_index != -1 and current_index < index):
-            index = current_index
+    # expression = r'(?:nvidia|geforce|rtx)[\S\s]*?\d{4}(\s?Ti)?' #has keyword "GPU"
+    # expression2 = r'(?:amd|intel|iris)(?!.*(?:ryzen|cpu|processor))[\S\s]*?graphics'
+    # expression4 = r'(?:\S+)?Core[\S\s]*?(?:gpu)'
 
-    #find break char on the left
-    for i in range(index, 0, -1):
-        if temp[i] in break_char:
-            
-            left_break = i
-            break
-    #find break char on the right
-    for i in range(index, len(temp)):
-        if temp[i] in break_char or i == len(temp)-1:
-            right_break = i
-            break
+    patterns = [
+        r'(?:nvidia|geforce|rtx)[\S\s]*?\d{4}(\s?Ti)?', #has keyword "GPU"
+        r'(?:amd|intel|iris|radeon)(?!.*(?:ryzen|cpu|processor))[\S\s]*?graphics',
+        r'(?:\S+)?Core[\S\s]*?(?!\s*(?:CPU))(?:gpu)',
+        r'(?:radeon|amd|intel|(?:\S+)?Core)[\S\s]*?(?:gpu|graphics)'
+    ]
 
-    try:
-        return word[left_break+1:right_break].strip()
-    except:
-        return None
+    for p in patterns:
+        match = re.search(p,word, re.IGNORECASE)
+        if match and len(match.group()) < 40:
+            return match.group()
+ 
+    return None
+
+
+def find_ram(word):
+    # expression = r'(?:\S+)?RAM[\S\s]*?\d{3,5}[A-Za-z]{1,3}' #has keyword "RAM"
+    expression = r'\d+\s?GB\s?(?:DDR\d\s?|RAM|Unified Memory)' #has keyword "RAM"
+    match = re.search(expression,word, re.IGNORECASE)
+    if match:
+        return match.group()
+
+    return None
+
+def find_storage(word):
+    # expression = r'\d+(?:TB|GB)\s*(?:(?!RAM|DDR)[\S\s])*(?:storage|ssd|hdd)'
+    expression = r'\d+(?:\s?)(?:TB|GB)(?!\s*(?:RAM|DDR|Unified Memory))[\S\s]*?(?:storage|SSD|HDD|eMMC)'
+    match = re.search(expression,word, re.IGNORECASE)
+
+    if match:
+        return match.group()
+    return None
 
 def get_specs(word):
     return_this = {
@@ -122,3 +86,8 @@ def get_specs(word):
     return return_this
 
 
+print(find_GPU(test))
+
+# print(find_cpu(test2))
+# print(find_cpu(test3))
+# print(find_cpu(test4))
